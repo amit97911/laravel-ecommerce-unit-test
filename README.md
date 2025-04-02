@@ -6,3 +6,23 @@
 
 # Changes:
 ## 1. Written test cases for User registration, Login, Add to cart, Checkout process
+
+
+
+
+
+# TEST CASES:
+**User registration**
+php artisan test --filter=UserRegistrationTest  
+
+**Login**
+php artisan test --filter=UserLoginTest
+
+**Add to cart**
+php artisan test --filter=CartTest  
+
+**Checkout process**
+php artisan test --filter=CheckoutTest
+
+**ALL CASES**
+php artisan test --filter=Unit

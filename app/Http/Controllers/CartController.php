@@ -69,18 +69,14 @@ class CartController extends Controller
     {
         $request->validate([
             'slug' => 'required',
-            'quant' => 'required',
         ]);
-        // dd($request->quant[1]);
 
         $product = Product::where('slug', $request->slug)->first();
-        if ($product->stock < $request->quant[1]) {
-            return back()->with('error', 'Out of stock, You can add other products.');
+        if (empty($product)) {
+            return back()->with('error', 'Invalid Products');
         }
-        if (($request->quant[1] < 1) || empty($product)) {
-            request()->session()->flash('error', 'Invalid Products');
-
-            return back();
+        if ($product->stock == 0) {
+            return back()->with('error', 'Out of stock, You can add other products.');
         }
 
         $already_cart = Cart::where('user_id', auth()->user()->id)->where('order_id', null)->where('product_id', $product->id)->first();
@@ -88,9 +84,8 @@ class CartController extends Controller
         // return $already_cart;
 
         if ($already_cart) {
-            $already_cart->quantity = $already_cart->quantity + $request->quant[1];
-            // $already_cart->price = ($product->price * $request->quant[1]) + $already_cart->price ;
-            $already_cart->amount = ($product->price * $request->quant[1]) + $already_cart->amount;
+            $already_cart->quantity = $already_cart->quantity + 1;
+            $already_cart->amount = ($product->price * 1) + $already_cart->amount;
 
             if ($already_cart->product->stock < $already_cart->quantity || $already_cart->product->stock <= 0) {
                 return back()->with('error', 'Stock not sufficient!.');
@@ -104,8 +99,8 @@ class CartController extends Controller
             $cart->user_id = auth()->user()->id;
             $cart->product_id = $product->id;
             $cart->price = ($product->price - ($product->price * $product->discount) / 100);
-            $cart->quantity = $request->quant[1];
-            $cart->amount = ($product->price * $request->quant[1]);
+            $cart->quantity = 1;
+            $cart->amount = ($product->price * 1);
             if ($cart->product->stock < $cart->quantity || $cart->product->stock <= 0) {
                 return back()->with('error', 'Stock not sufficient!.');
             }
@@ -257,7 +252,7 @@ class CartController extends Controller
 
     public function checkout(Request $request)
     {
-        $cart = session('cart');
+        $cart = (session('cart') != null) ? session('cart') : [];
         $cart_index = \Str::random(10);
         $sub_total = 0;
         foreach ($cart as $cart_item) {
