@@ -26,3 +26,11 @@ php artisan test --filter=CheckoutTest
 
 **ALL CASES**
 php artisan test --filter=Unit
+
+
+
+
+
+
+
+## IF YOU ARE READING THIS, ANY FEEDBACK WOULD BE APPRECIATED.
